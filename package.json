@@ -1,0 +1,32 @@
+{
+  "name": "jalsetu-smart-water-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered Smart Water Distribution & Transparency Platform for citizens and government authorities.",
+  "type": "module",
+  "scripts": {
+    "setup:env": "node scripts/setup-env.js",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "setup": "npm run setup:env && npm run install:all",
+    "dev": "node scripts/dev.js",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:web": "npm --prefix frontend run dev",
+    "client:dev": "npm run dev:web",
+    "server:dev": "npm run dev:api",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "seed": "npm --prefix backend run seed",
+    "check": "node --check backend/src/server.js && node --check backend/src/seed.js && node --check scripts/setup-env.js && node --check scripts/doctor.js && node --check scripts/dev.js",
+    "doctor": "node scripts/doctor.js"
+  },
+  "keywords": [
+    "water",
+    "smart-city",
+    "react",
+    "express",
+    "mongodb",
+    "transparency"
+  ],
+  "author": "Tech Titans",
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+import { UserCircle } from 'lucide-react';
+import { useApp } from '../context/AppContext.jsx';
+
+export default function Profile() {
+  const { user, language, setLanguage, darkMode, setDarkMode } = useApp();
+  return <div className="mx-auto max-w-3xl space-y-5"><h1 className="flex items-center gap-3 text-4xl font-black"><UserCircle className="text-jal-600" /> Profile</h1><div className="glass-card p-6"><h2 className="text-2xl font-black">{user?.name || 'Guest User'}</h2><p className="text-slate-500">{user?.email} · {user?.role}</p><div className="mt-6 grid gap-4 md:grid-cols-2"><label>Language<select className="input mt-2" value={language} onChange={(e) => setLanguage(e.target.value)}><option value="en">English</option><option value="hi">हिंदी</option></select></label><label>Theme<select className="input mt-2" value={darkMode ? 'dark' : 'light'} onChange={(e) => setDarkMode(e.target.value === 'dark')}><option value="light">Light</option><option value="dark">Dark</option></select></label></div></div><div className="glass-card p-6"><h3 className="text-xl font-black">Water-saving tips</h3><ul className="mt-3 list-disc space-y-2 pl-5 text-slate-500"><li>Repair leaking taps within 24 hours.</li><li>Reuse RO reject water for cleaning and gardening.</li><li>Store only required water during supply windows.</li><li>Report visible pipeline leakage immediately through JalSetu.</li></ul></div></div>;
+}
