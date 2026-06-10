@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JalWatch AI - Smart Water Distribution Platform</title>
+  <style>
+    :root {
+      --bg: #eef7fb;
+      --surface: rgba(255, 255, 255, .84);
+      --surface-strong: #ffffff;
+      --text: #10202d;
+      --muted: #607382;
+      --line: rgba(21, 92, 124, .16);
+      --primary: #0677b8;
+      --primary-dark: #075f92;
+      --aqua: #02a7a7;
+      --green: #16885b;
+      --amber: #b26a00;
+      --red: #c93a3a;
+      --blue-soft: #dff4ff;
+      --shadow: 0 18px 60px rgba(8, 72, 107, .14);
+      --radius: 8px;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #07131d;
+      --surface: rgba(14, 32, 45, .82);
+      --surface-strong: #0e202d;
+      --text: #ecf8ff;
+      --muted: #a8bdca;
+      --line: rgba(174, 224, 245, .18);
+      --primary: #40b7ff;
+      --primary-dark: #83d2ff;
+      --aqua: #34d5d5;
+      --green: #55d697;
+      --amber: #ffc15d;
+      --red: #ff7777;
+      --blue-soft: rgba(64, 183, 255, .12);
+      --shadow: 0 18px 70px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(6, 119, 184, .16), transparent 32%),
+        linear-gradient(225deg, rgba(2, 167, 167, .13), transparent 34%),
+        var(--bg);
+      font-family: var(--sans);
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, .62);
+      backdrop-filter: blur(22px);
+      overflow-y: auto;
+    }
+
+    [data-theme="dark"] .sidebar { background: rgba(7, 19, 29, .68); }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 6px 0 18px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(145deg, var(--primary), var(--aqua));
+      box-shadow: 0 12px 30px rgba(6, 119, 184, .25);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+      margin: 16px 0;
+    }
+
+    .nav a, .mobile-tab {
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav a.active, .nav a:hover, .mobile-tab.active {
+      color: var(--primary-dark);
+      border-color: var(--line);
+      background: var(--surface);
+    }
+
+    .side-panel {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .side-panel h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+    }
+
+    .side-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    main {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: -18px -18px 18px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(238, 247, 251, .78);
+      backdrop-filter: blur(18px);
+    }
+
+    [data-theme="dark"] .topbar { background: rgba(7, 19, 29, .78); }
+
+    .search {
+      flex: 1;
+      max-width: 560px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--primary), var(--aqua));
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+
+    .hero-copy {
+      position: relative;
+      overflow: hidden;
+      min-height: 380px;
+      padding: 30px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(5, 32, 49, .26), rgba(5, 32, 49, .68)),
+        url("https://images.unsplash.com/photo-1523437237164-d442d57cc3c9?auto=format&fit=crop&w=1400&q=80") center/cover;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy h2 {
+      max-width: 790px;
+      margin: 0;
+      font-size: clamp(34px, 5vw, 68px);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+
+    .hero-copy p {
+      max-width: 680px;
+      margin: 14px 0 0;
+      color: rgba(255, 255, 255, .88);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: inherit;
+      border: 1px solid rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .12);
+      backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .panel, .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2, .section-title h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .section-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .metric {
+      padding: 15px;
+      min-height: 124px;
+    }
+
+    .metric small {
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 8px;
+      margin-top: 14px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(6, 119, 184, .12);
+    }
+
+    .progress i {
+      display: block;
+      height: 100%;
+      width: var(--value);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), var(--aqua));
+    }
+
+    .module {
+      margin-top: 16px;
+    }
+
+    .tabs, .mobile-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 10px 12px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--primary), var(--aqua));
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .schedule {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .48);
+    }
+
+    [data-theme="dark"] .schedule { background: rgba(255, 255, 255, .04); }
+
+    .time {
+      color: var(--primary-dark);
+      font-weight: 900;
+    }
+
+    .status {
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(22, 136, 91, .12);
+      color: var(--green);
+    }
+
+    .status.warn { background: rgba(178, 106, 0, .12); color: var(--amber); }
+    .status.bad { background: rgba(201, 58, 58, .12); color: var(--red); }
+
+    .map-wrap {
+      position: relative;
+      min-height: 470px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, transparent 31px, rgba(6, 119, 184, .12) 32px),
+        linear-gradient(transparent 31px, rgba(6, 119, 184, .12) 32px),
+        var(--blue-soft);
+      background-size: 64px 64px;
+    }
+
+    .river {
+      position: absolute;
+      left: -4%;
+      right: -4%;
+      top: 43%;
+      height: 72px;
+      transform: rotate(-8deg);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(64, 183, 255, .52), rgba(2, 167, 167, .35));
+    }
+
+    .zone, .tanker, .leak {
+      position: absolute;
+      border-radius: var(--radius);
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, .42);
+      color: #fff;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, .16);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .zone small, .tanker small, .leak small {
+      display: block;
+      margin-top: 4px;
+      font-weight: 700;
+      opacity: .86;
+    }
+
+    .zone.live { background: rgba(22, 136, 91, .86); }
+    .zone.next { background: rgba(6, 119, 184, .86); }
+    .zone.short { background: rgba(178, 106, 0, .88); }
+    .zone.maint { background: rgba(201, 58, 58, .84); }
+    .tanker { width: 110px; background: rgba(16, 32, 45, .88); animation: drive 7s ease-in-out infinite alternate; }
+    .leak { width: 94px; background: rgba(201, 58, 58, .86); animation: pulse 1.8s ease-in-out infinite; }
+
+    @keyframes drive { to { transform: translate(82px, -38px); } }
+    @keyframes pulse { 50% { transform: scale(1.05); } }
+
+    .legend {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: 360px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      background: currentColor;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    .table th, .table td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .table tr:last-child td { border-bottom: 0; }
+
+    .chart {
+      height: 220px;
+      display: flex;
+      align-items: end;
+      gap: 12px;
+      padding: 18px 8px 4px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, transparent, rgba(6, 119, 184, .08));
+    }
+
+    .bar {
+      flex: 1;
+      min-width: 28px;
+      border-radius: 8px 8px 3px 3px;
+      height: var(--h);
+      background: linear-gradient(180deg, var(--primary), var(--aqua));
+      position: relative;
+    }
+
+    .bar span {
+      position: absolute;
+      left: 50%;
+      bottom: -24px;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .complaint-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 11px;
+      outline: 0;
+      color: var(--text);
+      background: var(--surface-strong);
+    }
+
+    .field textarea { min-height: 98px; resize: vertical; }
+
+    .assistant {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 424px;
+    }
+
+    .messages {
+      display: grid;
+      gap: 9px;
+      align-content: start;
+      padding: 8px 0;
+      max-height: 310px;
+      overflow-y: auto;
+    }
+
+    .msg {
+      max-width: 88%;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      background: var(--blue-soft);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .msg.user {
+      justify-self: end;
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .chatbox {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chatbox input {
+      flex: 1;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 11px;
+      background: var(--surface-strong);
+      color: var(--text);
+      outline: 0;
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .45);
+    }
+
+    [data-theme="dark"] .alert { background: rgba(255, 255, 255, .04); }
+
+    .alert b { display: block; margin-bottom: 3px; }
+    .alert p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      margin-top: 4px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(22, 136, 91, .12);
+    }
+
+    .dot.warn { background: var(--amber); box-shadow: 0 0 0 6px rgba(178, 106, 0, .12); }
+    .dot.bad { background: var(--red); box-shadow: 0 0 0 6px rgba(201, 58, 58, .12); }
+
+    .mobile-tabs { display: none; margin-bottom: 14px; overflow-x: auto; flex-wrap: nowrap; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      max-width: 360px;
+      padding: 13px 14px;
+      border-radius: var(--radius);
+      color: #fff;
+      background: #10202d;
+      box-shadow: var(--shadow);
+      transform: translateY(130%);
+      transition: transform .25s ease;
+    }
+
+    .toast.show { transform: translateY(0); }
+
+    @media (max-width: 1120px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .mobile-tabs { display: flex; }
+      .hero { grid-template-columns: 1fr; }
+      .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      main { padding: 12px; }
+      .topbar {
+        margin: -12px -12px 12px;
+        padding: 10px 12px;
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .actions { overflow-x: auto; }
+      .hero-copy { min-height: 470px; padding: 20px; }
+      .grid.cols-4, .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; }
+      .schedule { grid-template-columns: 1fr; }
+      .complaint-form { grid-template-columns: 1fr; }
+      .map-wrap { min-height: 560px; }
+      .table { min-width: 760px; }
+      .table-wrap { overflow-x: auto; }
+      .legend { left: 12px; right: 12px; }
+      .hero-copy h2 { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">JW</div>
+        <div>
+          <h1>JalWatch AI</h1>
+          <span>Smart water command center</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="#citizen" class="active" data-view-link="citizen">Citizen Dashboard <span>01</span></a>
+        <a href="#transparency" data-view-link="transparency">Transparency <span>02</span></a>
+        <a href="#map" data-view-link="map">Live Map <span>03</span></a>
+        <a href="#complaints" data-view-link="complaints">Complaints <span>04</span></a>
+        <a href="#assistant" data-view-link="assistant">AI Assistant <span>05</span></a>
+        <a href="#admin" data-view-link="admin">Gov Dashboard <span>06</span></a>
+      </nav>
+      <div class="side-panel">
+        <h3>Open-source deployment</h3>
+        <p>Designed as a modular reference app for municipal corporations, smart-city missions, panchayats, and water boards.</p>
+      </div>
+      <div class="side-panel">
+        <h3>Today at a glance</h3>
+        <p>6 active wards, 91% distribution efficiency, 3 tankers on duty, 42 complaints under SLA.</p>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <label class="search" aria-label="Search area">
+          <span>Search</span>
+          <input id="areaSearch" type="search" placeholder="Ward, locality, tanker, complaint ID..." />
+        </label>
+        <div class="actions">
+          <button class="btn" id="langBtn">Hindi</button>
+          <button class="btn" id="themeBtn">Dark mode</button>
+          <button class="btn primary" id="notifyBtn">Enable alerts</button>
+        </div>
+      </header>
+
+      <div class="mobile-tabs" aria-label="Mobile navigation">
+        <button class="mobile-tab active" data-view-link="citizen">Citizen</button>
+        <button class="mobile-tab" data-view-link="transparency">Transparency</button>
+        <button class="mobile-tab" data-view-link="map">Map</button>
+        <button class="mobile-tab" data-view-link="complaints">Complaints</button>
+        <button class="mobile-tab" data-view-link="assistant">Assistant</button>
+        <button class="mobile-tab" data-view-link="admin">Admin</button>
+      </div>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <div>
+            <span class="chip">Live municipal water intelligence</span>
+            <h2>JalWatch AI</h2>
+            <p>Smart Water Distribution, Transparency and Citizen Awareness Platform for reliable public water supply.</p>
+            <div class="hero-chips">
+              <span class="chip">Real-time supply schedules</span>
+              <span class="chip">GPS tanker monitoring</span>
+              <span class="chip">AI shortage forecasts</span>
+              <span class="chip">Citizen complaint SLA</span>
+            </div>
+          </div>
+          <div class="hero-chips">
+            <button class="btn primary" data-view-link="map">Track live tanker</button>
+            <button class="btn" data-view-link="complaints">Report issue</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">
+            <div>
+              <h2>Supply Status</h2>
+              <p>Ward 12, Lakshmi Nagar Zone</p>
+            </div>
+            <span class="status">Live</span>
+          </div>
+          <div class="grid cols-2">
+            <div class="card metric">
+              <small>Next supply</small>
+              <strong>06:00 AM</strong>
+              <span>2 hours window</span>
+              <div class="progress"><i style="--value:76%"></i></div>
+            </div>
+            <div class="card metric">
+              <small>Available today</small>
+              <strong>470K L</strong>
+              <span>94% delivered</span>
+              <div class="progress"><i style="--value:94%"></i></div>
+            </div>
+            <div class="card metric">
+              <small>Tanker ETA</small>
+              <strong>18 min</strong>
+              <span>Vehicle TNK-204</span>
+              <div class="progress"><i style="--value:62%"></i></div>
+            </div>
+            <div class="card metric">
+              <small>Complaints</small>
+              <strong>42</strong>
+              <span>31 resolved today</span>
+              <div class="progress"><i style="--value:74%"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="citizen" class="view active">
+        <div class="grid cols-4">
+          <div class="card metric"><small>Water supplied today</small><strong>12.8 ML</strong><span>Across 18 wards</span><div class="progress"><i style="--value:88%"></i></div></div>
+          <div class="card metric"><small>Distribution efficiency</small><strong>91%</strong><span>+4.2% from last week</span><div class="progress"><i style="--value:91%"></i></div></div>
+          <div class="card metric"><small>Shortage risk</small><strong>Medium</strong><span>Summer demand rising</span><div class="progress"><i style="--value:58%"></i></div></div>
+          <div class="card metric"><small>Leak alerts</small><strong>7</strong><span>3 high priority</span><div class="progress"><i style="--value:43%"></i></div></div>
+        </div>
+
+        <div class="grid cols-2 module">
+          <div class="panel">
+            <div class="section-title">
+              <div><h3>Daily Supply Schedule</h3><p>Citizen-facing timing and service updates</p></div>
+            </div>
+            <div class="timeline" id="scheduleList"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">
+              <div><h3>Smart Notifications</h3><p>SMS, email and mobile alert queue</p></div>
+            </div>
+            <div class="alert-list">
+              <div class="alert"><span class="dot"></span><div><b>Supply begins in Ward 12 at 06:00 AM</b><p>Citizens will receive a 30-minute reminder in English and Hindi.</p></div></div>
+              <div class="alert"><span class="dot warn"></span><div><b>Reduced pressure expected near Sector B</b><p>AI forecast shows 18% higher demand due to heat conditions.</p></div></div>
+              <div class="alert"><span class="dot bad"></span><div><b>Pipeline maintenance on Ring Road</b><p>Expected delay of 35 minutes. Tanker backup assigned.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="transparency" class="view">
+        <div class="panel">
+          <div class="section-title">
+            <div><h2>Water Distribution Transparency System</h2><p>Planned allocation vs actual delivery with public accountability metrics</p></div>
+            <button class="btn primary" id="downloadReport">Download report</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Ward</th><th>Source</th><th>Allocated</th><th>Delivered</th><th>Supply Time</th><th>Efficiency</th><th>Status</th><th>Reason</th></tr>
+              </thead>
+              <tbody id="wardTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid cols-3 module">
+          <div class="card metric"><small>Allocated water</small><strong>13.9 ML</strong><span>Total city allocation</span><div class="progress"><i style="--value:100%"></i></div></div>
+          <div class="card metric"><small>Delivered water</small><strong>12.8 ML</strong><span>Publicly verified</span><div class="progress"><i style="--value:92%"></i></div></div>
+          <div class="card metric"><small>Completion</small><strong>87%</strong><span>Remaining 5 zones</span><div class="progress"><i style="--value:87%"></i></div></div>
+        </div>
+      </section>
+
+      <section id="map" class="view">
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="section-title">
+              <div><h2>Interactive Water Supply Map</h2><p>GIS-style operational view with live zones, tankers, maintenance and leakage hotspots</p></div>
+            </div>
+            <div class="map-wrap" aria-label="Water distribution map">
+              <div class="river"></div>
+              <div class="zone live" style="left:8%;top:12%">Ward 12<small>Receiving water</small></div>
+              <div class="zone next" style="left:50%;top:14%">Ward 18<small>Upcoming 08:30 AM</small></div>
+              <div class="zone short" style="left:21%;top:59%">Sector B<small>Shortage zone</small></div>
+              <div class="zone maint" style="left:63%;top:57%">Ring Road<small>Maintenance</small></div>
+              <div class="tanker" style="left:35%;top:36%">TNK-204<small>ETA 18 min</small></div>
+              <div class="tanker" style="left:70%;top:28%;animation-delay:-2s">TNK-118<small>Route active</small></div>
+              <div class="leak" style="left:13%;top:36%">Leak L7<small>High risk</small></div>
+              <div class="legend">
+                <span style="color:var(--green)">Live</span>
+                <span style="color:var(--primary)">Upcoming</span>
+                <span style="color:var(--amber)">Shortage</span>
+                <span style="color:var(--red)">Maintenance or leak</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">
+              <div><h2>Live Tanker Tracking</h2><p>GPS assignments, ETA, route and delivery confirmation logs</p></div>
+            </div>
+            <div class="timeline" id="tankerList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="complaints" class="view">
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="section-title">
+              <div><h2>Report Water Issue</h2><p>GPS-tagged complaint flow for leakage, low pressure, contamination and illegal connections</p></div>
+            </div>
+            <form class="complaint-form" id="complaintForm">
+              <div class="field"><label for="issueType">Issue type</label><select id="issueType"><option>Water leakage</option><option>No water supply</option><option>Low pressure</option><option>Contaminated water</option><option>Broken pipeline</option><option>Illegal connection</option></select></div>
+              <div class="field"><label for="ward">Ward or locality</label><input id="ward" required value="Ward 12, Lakshmi Nagar" /></div>
+              <div class="field"><label for="photo">Image upload</label><input id="photo" type="file" accept="image/*" /></div>
+              <div class="field"><label for="gps">GPS tag</label><input id="gps" value="28.6139, 77.2090" /></div>
+              <div class="field full"><label for="details">Details</label><textarea id="details" placeholder="Describe the issue, landmark and urgency..."></textarea></div>
+              <div class="field full"><button class="btn primary" type="submit">Submit complaint</button></div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">
+              <div><h2>Complaint Tracking</h2><p>Status updates, authority response and SLA monitoring</p></div>
+            </div>
+            <div class="timeline" id="complaintList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="assistant" class="view">
+        <div class="grid cols-2">
+          <div class="panel assistant">
+            <div class="section-title">
+              <div><h2>AI Water Assistant</h2><p>English, Hindi and voice-ready assistant for citizens</p></div>
+              <button class="btn" id="voiceBtn">Voice</button>
+            </div>
+            <div class="messages" id="messages">
+              <div class="msg">Namaste. I can answer supply timings, tanker schedules, complaint status, water-saving tips and emergency updates.</div>
+            </div>
+            <form class="chatbox" id="chatForm">
+              <input id="chatInput" placeholder="Ask: When will water come in Ward 12?" />
+              <button class="btn primary" type="submit">Send</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">
+              <div><h2>AI Insights</h2><p>Demand forecasting and leak detection from reports, sensors and distribution history</p></div>
+            </div>
+            <div class="chart" aria-label="Demand forecast chart">
+              <div class="bar" style="--h:46%"><span>Mon</span></div>
+              <div class="bar" style="--h:54%"><span>Tue</span></div>
+              <div class="bar" style="--h:63%"><span>Wed</span></div>
+              <div class="bar" style="--h:76%"><span>Thu</span></div>
+              <div class="bar" style="--h:84%"><span>Fri</span></div>
+              <div class="bar" style="--h:92%"><span>Sat</span></div>
+              <div class="bar" style="--h:88%"><span>Sun</span></div>
+            </div>
+            <div class="alert-list" style="margin-top:34px">
+              <div class="alert"><span class="dot warn"></span><div><b>Summer demand forecast</b><p>Expected 22% demand increase in Wards 12, 14 and 18. Recommend 2 additional tankers.</p></div></div>
+              <div class="alert"><span class="dot bad"></span><div><b>Possible leakage anomaly</b><p>Sensor flow mismatch near Old Market pipeline suggests 38,000 liters daily loss.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin" class="view">
+        <div class="panel">
+          <div class="section-title">
+            <div><h2>Government Administration Dashboard</h2><p>Allocation management, tanker dispatch, resource planning, ward analytics and performance reporting</p></div>
+            <div class="tabs">
+              <button class="tab active" data-admin-tab="allocation">Allocation</button>
+              <button class="tab" data-admin-tab="tankers">Tankers</button>
+              <button class="tab" data-admin-tab="reports">Reports</button>
+            </div>
+          </div>
+          <div class="grid cols-4">
+            <div class="card metric"><small>Active schedules</small><strong>26</strong><span>4 revised today</span><div class="progress"><i style="--value:72%"></i></div></div>
+            <div class="card metric"><small>Tanker utilization</small><strong>84%</strong><span>11 of 13 vehicles</span><div class="progress"><i style="--value:84%"></i></div></div>
+            <div class="card metric"><small>SLA compliance</small><strong>78%</strong><span>Complaint response</span><div class="progress"><i style="--value:78%"></i></div></div>
+            <div class="card metric"><small>Resource risk</small><strong>2 zones</strong><span>Need intervention</span><div class="progress"><i style="--value:35%"></i></div></div>
+          </div>
+        </div>
+
+        <div class="grid cols-2 module">
+          <div class="panel">
+            <div class="section-title"><div><h3>Ward-wise Performance</h3><p>Operational efficiency overview</p></div></div>
+            <div class="chart">
+              <div class="bar" style="--h:86%"><span>W12</span></div>
+              <div class="bar" style="--h:73%"><span>W13</span></div>
+              <div class="bar" style="--h:91%"><span>W14</span></div>
+              <div class="bar" style="--h:66%"><span>W15</span></div>
+              <div class="bar" style="--h:82%"><span>W18</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="section-title"><div><h3>Action Queue</h3><p>AI-recommended authority actions</p></div></div>
+            <div class="alert-list">
+              <div class="alert"><span class="dot bad"></span><div><b>Dispatch emergency repair crew</b><p>High-confidence leak near Old Market. Suggested priority: P1.</p></div></div>
+              <div class="alert"><span class="dot warn"></span><div><b>Increase Ward 18 allocation</b><p>Forecasted demand exceeds allocation by 14% from 5 PM to 8 PM.</p></div></div>
+              <div class="alert"><span class="dot"></span><div><b>Publish daily transparency bulletin</b><p>Citizen portal report is ready for release in English and Hindi.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const schedules = [
+      ["06:00 AM", "Ward 12 - Lakshmi Nagar", "500,000 L allocated, expected completion 08:00 AM", "Live"],
+      ["08:30 AM", "Ward 18 - New Colony", "420,000 L from North Reservoir", "Upcoming"],
+      ["11:00 AM", "Sector B", "Reduced pressure due to maintenance", "Delayed"],
+      ["05:30 PM", "Rural Cluster 4", "Tanker-backed supply window", "Planned"]
+    ];
+
+    const wards = [
+      ["Ward 12", "North Reservoir", "500,000 L", "470,000 L", "06:00 - 08:00", "94%", "Delayed", "Pipeline maintenance"],
+      ["Ward 13", "East Treatment Plant", "380,000 L", "372,000 L", "07:00 - 09:00", "98%", "Completed", "On schedule"],
+      ["Ward 14", "River Pump Station", "610,000 L", "588,000 L", "09:30 - 11:30", "96%", "Completed", "Minor pressure drop"],
+      ["Ward 15", "South Reservoir", "450,000 L", "318,000 L", "10:00 - 12:00", "71%", "Shortage", "High summer demand"],
+      ["Ward 18", "North Reservoir", "420,000 L", "0 L", "08:30 - 10:00", "0%", "Upcoming", "Awaiting valve release"]
+    ];
+
+    const tankers = [
+      ["TNK-204", "Assigned to Sector B", "ETA 18 min", "7,500 L remaining", "Live"],
+      ["TNK-118", "Rural Cluster 4", "ETA 42 min", "10,000 L remaining", "Live"],
+      ["TNK-091", "Ward 15 backup", "Arrived", "Delivery confirmed by society", "Done"],
+      ["TNK-077", "Maintenance reserve", "Standby", "Ready for emergency dispatch", "Ready"]
+    ];
+
+    const complaints = [
+      ["JW-2401", "Water leakage", "Old Market pipeline", "Crew assigned", "P1"],
+      ["JW-2398", "Low pressure", "Sector B Block 4", "Under review", "P2"],
+      ["JW-2387", "Contaminated water", "Ward 13 School Road", "Resolved", "P1"]
+    ];
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    function renderSchedules() {
+      $("#scheduleList").innerHTML = schedules.map(([time, area, note, status]) => `
+        <div class="schedule">
+          <div class="time">${time}</div>
+          <div><b>${area}</b><br><span style="color:var(--muted);font-size:13px">${note}</span></div>
+          <span class="status ${status === "Delayed" ? "warn" : ""}">${status}</span>
+        </div>`).join("");
+    }
+
+    function renderWards() {
+      $("#wardTable").innerHTML = wards.map(([ward, source, allocated, delivered, time, efficiency, status, reason]) => {
+        const tone = status === "Shortage" ? "bad" : status === "Delayed" || status === "Upcoming" ? "warn" : "";
+        return `<tr><td><b>${ward}</b></td><td>${source}</td><td>${allocated}</td><td>${delivered}</td><td>${time}</td><td>${efficiency}</td><td><span class="status ${tone}">${status}</span></td><td>${reason}</td></tr>`;
+      }).join("");
+    }
+
+    function renderTankers() {
+      $("#tankerList").innerHTML = tankers.map(([id, area, eta, load, state]) => `
+        <div class="schedule">
+          <div class="time">${id}</div>
+          <div><b>${area}</b><br><span style="color:var(--muted);font-size:13px">${load}</span></div>
+          <span class="status ${state === "Done" ? "" : "warn"}">${eta}</span>
+        </div>`).join("");
+    }
+
+    function renderComplaints() {
+      $("#complaintList").innerHTML = complaints.map(([id, type, area, state, priority]) => `
+        <div class="schedule">
+          <div class="time">${id}</div>
+          <div><b>${type}</b><br><span style="color:var(--muted);font-size:13px">${area} - ${state}</span></div>
+          <span class="status ${priority === "P1" ? "bad" : "warn"}">${priority}</span>
+        </div>`).join("");
+    }
+
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    function switchView(view) {
+      $$(".view").forEach((section) => section.classList.toggle("active", section.id === view));
+      $$("[data-view-link]").forEach((link) => link.classList.toggle("active", link.dataset.viewLink === view));
+      history.replaceState(null, "", `#${view}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    $$("[data-view-link]").forEach((item) => {
+      item.addEventListener("click", (event) => {
+        event.preventDefault();
+        switchView(item.dataset.viewLink);
+      });
+    });
+
+    $("#themeBtn").addEventListener("click", () => {
+      const isDark = document.documentElement.dataset.theme === "dark";
+      document.documentElement.dataset.theme = isDark ? "light" : "dark";
+      $("#themeBtn").textContent = isDark ? "Dark mode" : "Light mode";
+    });
+
+    $("#notifyBtn").addEventListener("click", () => showToast("Alerts enabled: mobile push, SMS and email notifications queued."));
+    $("#downloadReport").addEventListener("click", () => showToast("Transparency report generated for public release."));
+    $("#voiceBtn").addEventListener("click", () => showToast("Voice mode ready: microphone integration placeholder enabled."));
+    $("#langBtn").addEventListener("click", () => showToast("Hindi support enabled: JalWatch AI can answer in Hindi and English."));
+
+    $("#complaintForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const type = $("#issueType").value;
+      const ward = $("#ward").value || "Unknown location";
+      complaints.unshift([`JW-${Math.floor(3000 + Math.random() * 600)}`, type, ward, "Submitted to authority", "P2"]);
+      renderComplaints();
+      showToast("Complaint submitted with GPS tag and SLA tracking.");
+    });
+
+    $("#chatForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = $("#chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      const messages = $("#messages");
+      messages.insertAdjacentHTML("beforeend", `<div class="msg user">${text}</div>`);
+      const lower = text.toLowerCase();
+      let reply = "I found the latest JalWatch update: Ward 12 receives water from 06:00 AM to 08:00 AM. Tanker TNK-204 is 18 minutes away and complaint JW-2401 is assigned to a repair crew.";
+      if (lower.includes("hindi") || lower.includes("water") || lower.includes("pani")) {
+        reply = "Hindi support: Ward 12 me paani ki supply 06:00 AM se 08:00 AM tak scheduled hai. Tanker TNK-204 lagbhag 18 minute me pahunch raha hai.";
+      }
+      if (lower.includes("save") || lower.includes("tip")) {
+        reply = "Water-saving tip: store only required water, close taps during supply breaks, report leaks immediately, and reuse RO reject water for cleaning or gardening.";
+      }
+      messages.insertAdjacentHTML("beforeend", `<div class="msg">${reply}</div>`);
+      messages.scrollTop = messages.scrollHeight;
+      input.value = "";
+    });
+
+    $("#areaSearch").addEventListener("input", (event) => {
+      const query = event.target.value.trim();
+      if (query.length > 2) showToast(`Showing JalWatch intelligence for "${query}".`);
+    });
+
+    $$(".tab").forEach((tab) => tab.addEventListener("click", () => {
+      $$(".tab").forEach((item) => item.classList.remove("active"));
+      tab.classList.add("active");
+      showToast(`${tab.textContent} workspace opened for officials.`);
+    }));
+
+    renderSchedules();
+    renderWards();
+    renderTankers();
+    renderComplaints();
+
+    const initialView = location.hash.replace("#", "");
+    if (initialView && document.getElementById(initialView)) switchView(initialView);
+  </script>
+</body>
+</html>
